@@ -15,7 +15,7 @@ app.get("/send", async (req, res) => {
   // console.log(to, message);
   const message = await client.messages.create({
     from: "whatsapp:+14155238886",
-    body: "Message from a Bun server!",
+    body: "MR Ronny should buy an iPhone",
     to: `whatsapp:+27642448112`,
   });
 
