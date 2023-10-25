@@ -3,8 +3,14 @@ import { Database } from "bun:sqlite";
 export async function initializeDatabase() {
   try {
     const db = new Database("src/database/database.sqlite", { create: true });
+    const statement = db.query(`SELECT * FROM data`);
+    const row = statement.all();
+    if (!!row) {
+      return db;
+    }
     await createTables(db);
-    console.log("Database initialized successfully");
+    console.log("\nDatabase initialized successfully ☄️");
+
     return db;
   } catch (error) {
     throw error;
@@ -13,7 +19,6 @@ export async function initializeDatabase() {
 export function openDatabase(): Database {
   try {
     const db = new Database("src/database/database.sqlite");
-    console.log("Database opened successfully");
     return db;
   } catch (error) {
     throw error;
@@ -23,7 +28,7 @@ async function createTables(db: Database): Promise<void> {
   const createTableQueries = [
     `CREATE TABLE IF NOT EXISTS data (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        text TEXT,
+        text TEXT UNIQUE NOT NULL,
         label TEXT DEFAULT 'unknown',
         status TEXT DEFAULT 'unprocessed'
       );`,

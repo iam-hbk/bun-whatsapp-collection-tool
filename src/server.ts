@@ -1,8 +1,8 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import { readCSV } from "./utils/read_csv";
 import Database from "bun:sqlite";
 import { sessionController } from "./controllers/sessionController";
-
+import { messageController } from "./controllers/messageController";
 const app = express();
 const port = 3000;
 
@@ -14,7 +14,7 @@ let db: Database;
 try {
   db = await readCSV();
   db.exec("PRAGMA journal_mode = WAL;");
-  console.log("Database populated successfully");
+  console.log("\nDatabase Loaded Successfully 🚀");
 } catch (error) {
   console.error("DATABASE ERROR", (error as Error).message);
 }
@@ -24,24 +24,26 @@ app.get("/", async (req, res) => {
 });
 
 //listen to reponses
-// In your server file
 app.post(
   "/webhook",
-  express.urlencoded({ extended: false }),
-  async (req, res) => {
-    const { Body, From } = req.body;
-    console.log("Webhook ", Body, From);
-    if (Body.toLowerCase() === "start") {
-      await sessionController.startSession(From);
-    } else if (Body.toLowerCase() === "stop") {
-      await sessionController.stopSession(From);
-    } else {
-      await sessionController.processResponse(From, Body);
-    }
-    res.status(200).send();
+  express.urlencoded({ extended: true }),
+  express.json(),
+  messageController.handleIncomingMessage
+  // async (req, res) => {
+  //   messageController.handleIncomingMessage(req, res);
+  //   res.status(200).send();
+  // }
+);
+app.post(
+  "/error",
+  express.urlencoded({ extended: true }),
+  express.json(),
+  async (req: Request, res: Response) => {
+    // const { Body, From } = req.body;
+    console.log(JSON.parse(req.body.Payload));
+    console.log("Error occured");
   }
 );
-
 app.listen(port, async () => {
   console.log(`Server running on port ${port}`);
 });

@@ -37,7 +37,7 @@ export const sessionController = {
     if (response.split(" ").length != 2) {
       await whatsappService.sendMessage(
         user,
-        "Invalid response.\n Please try again.\n Example: 43 positive"
+        "Invalid response.\nPlease try again.\nExample: 43 positive"
       );
       return;
     }
@@ -62,4 +62,10 @@ export const sessionController = {
       await this.stopSession(user);
     }
   },
+  async handleMustStartSession(user:string){
+    await whatsappService.sendMessage(
+      user,
+      "You must start a session first. Please send *start* to start a session."
+    );
+  }
 };
