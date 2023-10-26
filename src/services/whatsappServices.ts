@@ -7,7 +7,7 @@ export const whatsappService = {
     try {
       await client.messages.create({
         from: "whatsapp:+14155238886", // your Twilio number
-        to: user,
+        to: `whatsapp:${user}`,
         body: text,
       });
     } catch (error) {
