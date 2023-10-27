@@ -33,11 +33,9 @@ app.post(
   "/webhook",
   express.urlencoded({ extended: true }),
   express.json(),
-  handleIncomingMessage
-  // async (req, res) => {
-  //   messageController.handleIncomingMessage(req, res);
-  //   res.status(200).send();
-  // }
+  async (req, res) => {
+    handleIncomingMessage(res, req);
+  }
 );
 app.post(
   "/error",

@@ -6,6 +6,7 @@ export interface IData {
   label: Label;
   status: Status;
   language: String;
+  classifiedBy: String;
 }
 export enum Label {
   POSITIVE = "POSITIVE",
@@ -19,7 +20,7 @@ export enum Status {
   PENDING_REVIEW = "PENDING_REVIEW",
 }
 const dataSchema = new Schema<IData>({
-  id: { type: Number, required: true,unique:true },
+  id: { type: Number, required: true, unique: true },
   text: { type: String, required: true },
   label: {
     type: String,
@@ -29,6 +30,7 @@ const dataSchema = new Schema<IData>({
   },
   status: { type: String, required: true, enum: Object.values(Status) },
   language: { type: String, required: true, default: "unknow" },
+  classifiedBy: { type: String, required: true, default: "unknow" },
 });
 
 const Data = model<IData>("Data", dataSchema);

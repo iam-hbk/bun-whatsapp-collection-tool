@@ -18,19 +18,43 @@ export const createData = async (
   }
 };
 
+interface IClassificationResult {
+  didClassify: boolean;
+  message: string;
+}
 export const classifyData = async (
   id: number,
   label: Label,
-  language: string
-): Promise<Boolean> => {
+  language: string,
+  classifiedBy: string
+): Promise<IClassificationResult> => {
   try {
-    const data = await Data.findOneAndUpdate(
-      { id },
-      { label, status: Status.PENDING_REVIEW, language }
-    );
-    return !!data;
+    const data = await Data.findOne({ id });
+
+    let res: typeof data = null;
+
+    if (!data) throw new Error("Data not found");
+    if (data.status !== Status.UNCLASSIFIED) {
+      return {
+        didClassify: true,
+        message: "Data has already been classified and is awaiting *Review*",
+      };
+    } else {
+      data.label = label;
+      data.status = Status.PENDING_REVIEW;
+      data.language = language;
+      data.classifiedBy = classifiedBy;
+      res = await data.save();
+      if (!res) throw new Error("Failed to save data");
+    }
+    return { didClassify: true, message: "Data Stored Successfully 🚀✅" };
   } catch (error) {
-    throw error;
+    return {
+      didClassify: false,
+      message: `An Error Occured while classifying the data\n\nError:${
+        (error as Error).message
+      }`,
+    };
   }
 };
 
@@ -52,13 +76,13 @@ export const reviewData = async (
   }
 };
 
-export const getOneUnclassifiedData = async (): Promise<IData | string> => {
+export const getOneUnclassifiedData = async (): Promise<IData | null> => {
   try {
     const data = await Data.findOne({ status: Status.UNCLASSIFIED });
-    if (!data) return "No unlabelled data available at the moment.";
+    if (!data) return null;
     return data;
   } catch (error) {
-    return "Failed to get unlabelled data, please try again later.";
+    return null;
   }
 };
 

@@ -24,14 +24,20 @@ export const getUser = async (phoneNumber: string): Promise<IUser | null> => {
 };
 export const setActive = async (phoneNumber: string): Promise<void> => {
   try {
-    await User.findOneAndUpdate({ phoneNumber }, { isActive: true });
+    const user = await User.findOneAndUpdate(
+      { phoneNumber },
+      { isActive: true }
+    );
+    if (!user) {
+      const new_user = await createUser(phoneNumber);
+    }
 
     const data = await getOneUnclassifiedData();
+    console.log(data?.toString());
     let message: string;
-    if (typeof data !== "string") {
-      message = prepareUnclassifiedDataMessage(data);
-    }
-    message = prepareUnclassifiedDataMessage(null);
+    console.log("[T]",typeof data);
+    
+    message = prepareUnclassifiedDataMessage(data);
     whatsappService.sendMessage(phoneNumber, message);
   } catch (error) {
     throw error;
